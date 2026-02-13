@@ -22,6 +22,17 @@
       "size": "450 KB",
       "file_count": 20,
       "preview_url": null
+    },
+    {
+      "id": "cuphead-announcer",
+      "name": "Cuphead Announcer",
+      "description": "Announcer voice lines from Cuphead: Don't Deal With the Devil!",
+      "version": "1.0",
+      "author": "Community",
+      "download_url": "https://github.com/michalarent/claude-sounds/releases/download/v2.0/cuphead-announcer.zip",
+      "size": "1.4 MB",
+      "file_count": 22,
+      "preview_url": null
     }
   ]
 }
