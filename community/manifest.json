@@ -1,71 +1,75 @@
 {
-  "version": "1",
-  "packs": [
+  "packs" : [
     {
-      "id": "protoss",
-      "name": "StarCraft Protoss",
-      "description": "Protoss voice lines from StarCraft",
-      "version": "1.0",
-      "author": "Blizzard Entertainment",
-      "download_url": "https://github.com/michalarent/claude-sounds/releases/download/v2.0/protoss.zip",
-      "size": "3.0 MB",
-      "file_count": 42,
-      "preview_url": null
+      "author" : "Blizzard Entertainment",
+      "description" : "Protoss voice lines from StarCraft",
+      "download_url" : "https:\/\/github.com\/michalarent\/claude-sounds\/releases\/download\/v2.0\/protoss.zip",
+      "file_count" : 42,
+      "id" : "protoss",
+      "name" : "StarCraft Protoss",
+      "size" : "3.0 MB",
+      "version" : "1.0"
     },
     {
-      "id": "super-mario-nes",
-      "name": "Super Mario Bros. (NES)",
-      "description": "Classic NES sound effects from Super Mario Bros.",
-      "version": "1.0",
-      "author": "Community",
-      "download_url": "https://github.com/michalarent/claude-sounds/releases/download/v2.0/super-mario-nes.zip",
-      "size": "450 KB",
-      "file_count": 20,
-      "preview_url": null
+      "author" : "Community",
+      "description" : "Classic NES sound effects from Super Mario Bros.",
+      "download_url" : "https:\/\/github.com\/michalarent\/claude-sounds\/releases\/download\/v2.0\/super-mario-nes.zip",
+      "file_count" : 20,
+      "id" : "super-mario-nes",
+      "name" : "Super Mario Bros. (NES)",
+      "size" : "450 KB",
+      "version" : "1.0"
     },
     {
-      "id": "diablo-2-necromancer",
-      "name": "Diablo II Necromancer",
-      "description": "Necromancer voice lines and spell sounds from Diablo II",
-      "version": "1.0",
-      "author": "Community",
-      "download_url": "https://github.com/michalarent/claude-sounds/releases/download/v2.0/diablo-2-necromancer.zip",
-      "size": "1.8 MB",
-      "file_count": 30,
-      "preview_url": null
+      "author" : "Community",
+      "description" : "Necromancer voice lines and spell sounds from Diablo II",
+      "download_url" : "https:\/\/github.com\/michalarent\/claude-sounds\/releases\/download\/v2.0\/diablo-2-necromancer.zip",
+      "file_count" : 30,
+      "id" : "diablo-2-necromancer",
+      "name" : "Diablo II Necromancer",
+      "size" : "1.8 MB",
+      "version" : "1.0"
     },
     {
-      "id": "cuphead-announcer",
-      "name": "Cuphead Announcer",
-      "description": "Announcer voice lines from Cuphead: Don't Deal With the Devil!",
-      "version": "1.0",
-      "author": "Community",
-      "download_url": "https://github.com/michalarent/claude-sounds/releases/download/v2.0/cuphead-announcer.zip",
-      "size": "1.4 MB",
-      "file_count": 22,
-      "preview_url": null
+      "author" : "Community",
+      "description" : "Announcer voice lines from Cuphead: Don't Deal With the Devil!",
+      "download_url" : "https:\/\/github.com\/michalarent\/claude-sounds\/releases\/download\/v2.0\/cuphead-announcer.zip",
+      "file_count" : 22,
+      "id" : "cuphead-announcer",
+      "name" : "Cuphead Announcer",
+      "size" : "1.4 MB",
+      "version" : "1.0"
     },
     {
-      "id": "diablo-2-paladin",
-      "name": "Diablo II Paladin",
-      "description": "Paladin voice lines from Diablo II: Lord of Destruction",
-      "version": "1.0",
-      "author": "Community",
-      "download_url": "https://github.com/michalarent/claude-sounds/releases/download/v2.0/diablo-2-paladin.zip",
-      "size": "3.0 MB",
-      "file_count": 38,
-      "preview_url": null
+      "author" : "Community",
+      "description" : "Paladin voice lines from Diablo II: Lord of Destruction",
+      "download_url" : "https:\/\/github.com\/michalarent\/claude-sounds\/releases\/download\/v2.0\/diablo-2-paladin.zip",
+      "file_count" : 38,
+      "id" : "diablo-2-paladin",
+      "name" : "Diablo II Paladin",
+      "size" : "3.0 MB",
+      "version" : "1.0"
     },
     {
-      "id": "dark-souls",
-      "name": "Dark Souls",
-      "description": "Iconic sound effects from Dark Souls — bonfires, parries, YOU DIED, and more",
-      "version": "1.0",
-      "author": "Community",
-      "download_url": "https://github.com/rottensunday/claude-sounds/releases/download/dark-souls-v1.0/dark-souls.zip",
-      "size": "5.1 MB",
-      "file_count": 17,
-      "preview_url": null
+      "author" : "Community",
+      "description" : "Iconic sound effects from Dark Souls — bonfires, parries, YOU DIED, and more",
+      "download_url" : "https:\/\/github.com\/rottensunday\/claude-sounds\/releases\/download\/dark-souls-v1.0\/dark-souls.zip",
+      "file_count" : 17,
+      "id" : "dark-souls",
+      "name" : "Dark Souls",
+      "size" : "5.1 MB",
+      "version" : "1.0"
+    },
+    {
+      "author" : "michalarent",
+      "description" : "Community sound pack",
+      "download_url" : "PLACEHOLDER_URL",
+      "file_count" : 45,
+      "id" : "diablo-druid",
+      "name" : "Diablo II Druid",
+      "size" : "4,5 MB",
+      "version" : "1.0"
     }
-  ]
+  ],
+  "version" : "1"
 }
