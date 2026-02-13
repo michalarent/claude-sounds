@@ -98,13 +98,12 @@ class SoundPackManager {
                 return
             }
 
-            let packDir = (self.soundsDir as NSString).appendingPathComponent(pack.id)
             let fm = FileManager.default
-            try? fm.createDirectory(atPath: packDir, withIntermediateDirectories: true)
 
+            // Extract to soundsDir — zip already contains the pack-id prefix directory
             let proc = Process()
             proc.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
-            proc.arguments = ["-o", tempUrl.path, "-d", packDir]
+            proc.arguments = ["-o", tempUrl.path, "-d", self.soundsDir]
             proc.standardOutput = FileHandle.nullDevice
             proc.standardError = FileHandle.nullDevice
 
