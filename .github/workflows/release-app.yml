@@ -47,5 +47,16 @@ jobs:
         run: |
           gh release create "${{ steps.version.outputs.tag }}" \
             --title "Claude Sounds ${{ steps.version.outputs.tag }}" \
-            --generate-notes \
+            --notes "$(cat <<'EOF'
+          ## Install
+
+          1. Download **ClaudeSounds.app.zip** below
+          2. Unzip and move `ClaudeSounds.app` wherever you like
+          3. Remove the macOS quarantine flag:
+          ```
+          xattr -cr /path/to/ClaudeSounds.app
+          ```
+          4. Open the app — it will appear in your menu bar
+          EOF
+          )" \
             ClaudeSounds.app.zip
