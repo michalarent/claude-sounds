@@ -49,6 +49,8 @@ class SoundImporterController: NSObject, NSTableViewDataSource, NSTableViewDeleg
 
         packPopup = NSPopUpButton(frame: .zero, pullsDown: false)
         packPopup.translatesAutoresizingMaskIntoConstraints = false
+        packPopup.target = self
+        packPopup.action = #selector(packChanged)
         contentView.addSubview(packPopup)
 
         let newPackBtn = NSButton(title: "New Pack...", target: self, action: #selector(createNewPack))
@@ -149,13 +151,21 @@ class SoundImporterController: NSObject, NSTableViewDataSource, NSTableViewDeleg
     }
 
     private func reloadPacks() {
+        let previousSelection = packPopup.selectedItem?.title
         let installed = SoundPackManager.shared.installedPackIds()
         packPopup.removeAllItems()
-        packPopup.addItems(withTitles: installed)
-
-        let active = SoundPackManager.shared.activePackId() ?? installed.first ?? ""
-        if let idx = installed.firstIndex(of: active) {
-            packPopup.selectItem(at: idx)
+        if installed.isEmpty {
+            packPopup.addItem(withTitle: "No packs installed")
+            packPopup.item(at: 0)?.isEnabled = false
+        } else {
+            packPopup.addItem(withTitle: "Select pack...")
+            packPopup.item(at: 0)?.isEnabled = false
+            packPopup.addItems(withTitles: installed)
+            // Restore previous selection if still available
+            if let prev = previousSelection,
+               let idx = installed.firstIndex(of: prev) {
+                packPopup.selectItem(at: idx + 1)
+            }
         }
     }
 
@@ -167,7 +177,8 @@ class SoundImporterController: NSObject, NSTableViewDataSource, NSTableViewDeleg
         } else {
             countLabel.stringValue = "\(count) file\(count == 1 ? "" : "s")"
         }
-        importButton.isEnabled = count > 0 && unassigned == 0 && packPopup.selectedItem != nil
+        let hasValidPack = packPopup.indexOfSelectedItem > 0
+        importButton.isEnabled = count > 0 && unassigned == 0 && hasValidPack
     }
 
     private func addValidFiles(from urls: [URL]) {
@@ -182,17 +193,21 @@ class SoundImporterController: NSObject, NSTableViewDataSource, NSTableViewDeleg
 
     // MARK: Actions
 
+    @objc func packChanged() {
+        updateUI()
+    }
+
     @objc func createNewPack() {
-        WindowManager.shared.showNewPack { [weak self] in
+        WindowManager.shared.showNewPack(onCreated: { [weak self] in
             self?.reloadPacks()
-            // Select the newly created pack (last one added)
+            // Select the newly created pack (the active one, since NewPackController sets it active)
             let installed = SoundPackManager.shared.installedPackIds()
-            if let last = installed.last,
-               let idx = installed.firstIndex(of: last) {
-                self?.packPopup.selectItem(at: idx)
+            if let active = SoundPackManager.shared.activePackId(),
+               let idx = installed.firstIndex(of: active) {
+                self?.packPopup.selectItem(at: idx + 1) // +1 for placeholder
             }
             self?.updateUI()
-        }
+        }, openEditorOnCreate: false)
     }
 
     @objc func addFiles() {

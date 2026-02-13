@@ -48,13 +48,13 @@ class WindowManager {
     private var newPackWindow: NSWindow?
     private var newPackController: NewPackController?
 
-    func showNewPack(onCreated: (() -> Void)? = nil) {
+    func showNewPack(onCreated: (() -> Void)? = nil, openEditorOnCreate: Bool = true) {
         if let w = newPackWindow, w.isVisible {
             w.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
-        let ctrl = NewPackController(onCreated: onCreated)
+        let ctrl = NewPackController(onCreated: onCreated, openEditorOnCreate: openEditorOnCreate)
         let w = ctrl.window
         newPackWindow = w
         newPackController = ctrl

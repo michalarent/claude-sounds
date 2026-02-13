@@ -11,9 +11,11 @@ class NewPackController: NSObject, NSTextFieldDelegate {
     private let errorLabel: NSTextField
     private var onCreated: (() -> Void)?
     private var updatingId = false
+    private var openEditorOnCreate: Bool
 
-    init(onCreated: (() -> Void)? = nil) {
+    init(onCreated: (() -> Void)? = nil, openEditorOnCreate: Bool = true) {
         self.onCreated = onCreated
+        self.openEditorOnCreate = openEditorOnCreate
 
         window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 420, height: 280),
@@ -140,6 +142,8 @@ class NewPackController: NSObject, NSTextFieldDelegate {
         SoundPackManager.shared.setActivePack(packId)
         window.close()
         onCreated?()
-        WindowManager.shared.showEventEditor()
+        if openEditorOnCreate {
+            WindowManager.shared.showEventEditor()
+        }
     }
 }
