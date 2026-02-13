@@ -276,7 +276,6 @@ class SoundPackManager {
             }
 
             group.notify(queue: .main) {
-                // Start with primary, then layer extras (later entries take precedence)
                 var allPacks = primary?.packs ?? []
                 let extraIds = Set(extraPacks.map { $0.id })
                 allPacks.removeAll { extraIds.contains($0.id) }

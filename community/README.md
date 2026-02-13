@@ -4,21 +4,15 @@ Share your sound packs with the community!
 
 ## Using community packs
 
-In the Claude Sounds app, go to **Sound Packs > Manage Registries...** and add:
+Community packs appear automatically in the **Sound Packs** browser under the "Available" section. Just open the app, browse, and click **Download & Install**.
 
-```
-https://raw.githubusercontent.com/michalarent/claude-sounds/main/community/manifest.json
-```
-
-All community packs will appear in your "Available" list.
-
-Or install any pack directly via **Install URL...** using the zip link from the table below.
+You can also install any pack directly via **Install URL...** using the zip link from the table below.
 
 ## Available packs
 
 | Pack | Author | Description | Download |
 |------|--------|-------------|----------|
-| — | — | *Be the first to contribute!* | — |
+| Super Mario Bros. (NES) | Community | Classic NES sound effects from Super Mario Bros. | [super-mario-nes.zip](packs/super-mario-nes.zip) |
 
 ## Contributing a pack
 

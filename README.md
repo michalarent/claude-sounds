@@ -2,6 +2,8 @@
 
 A macOS menu bar app for managing sound packs in [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Plays custom audio cues for Claude Code events like session start, prompt submit, notifications, and more.
 
+> **Want to contribute a community sound pack?** See [`community/README.md`](community/README.md) for how to create and submit your own pack. Community packs automatically appear in the app's Sound Pack Browser for all users to download.
+
 ## Features
 
 - **Menu bar controls** - Mute/unmute, volume slider, quick pack switching
