@@ -66,7 +66,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func buildMenuItems(_ menu: NSMenu) {
-        let header = NSMenuItem(title: "Claude Sounds", action: nil, keyEquivalent: "")
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0"
+        let header = NSMenuItem(title: "Claude Sounds v\(version)", action: nil, keyEquivalent: "")
         header.isEnabled = false
         menu.addItem(header)
         menu.addItem(.separator())
