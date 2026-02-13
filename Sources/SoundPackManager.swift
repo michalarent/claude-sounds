@@ -100,24 +100,7 @@ class SoundPackManager {
                 DispatchQueue.main.async { completion(false) }
                 return
             }
-
-            let fm = FileManager.default
-
-            // Extract to soundsDir — zip already contains the pack-id prefix directory
-            let proc = Process()
-            proc.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
-            proc.arguments = ["-o", tempUrl.path, "-d", self.soundsDir]
-            proc.standardOutput = FileHandle.nullDevice
-            proc.standardError = FileHandle.nullDevice
-
-            do {
-                try proc.run()
-                proc.waitUntilExit()
-                try? fm.removeItem(at: tempUrl)
-                DispatchQueue.main.async { completion(proc.terminationStatus == 0) }
-            } catch {
-                DispatchQueue.main.async { completion(false) }
-            }
+            self.extractZip(at: tempUrl, completion: completion)
         }
 
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
@@ -186,22 +169,28 @@ class SoundPackManager {
                 DispatchQueue.main.async { completion(false) }
                 return
             }
-            let proc = Process()
-            proc.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
-            proc.arguments = ["-o", fileURL.path, "-d", self.soundsDir]
-            proc.standardOutput = FileHandle.nullDevice
-            proc.standardError = FileHandle.nullDevice
+            // Copy to temp so extractZip can safely clean up without deleting the user's original
+            let tempCopy = URL(fileURLWithPath: NSTemporaryDirectory())
+                .appendingPathComponent(UUID().uuidString + ".zip")
             do {
-                try proc.run()
-                proc.waitUntilExit()
-                DispatchQueue.main.async { completion(proc.terminationStatus == 0) }
+                try FileManager.default.copyItem(at: fileURL, to: tempCopy)
             } catch {
                 DispatchQueue.main.async { completion(false) }
+                return
             }
+            self.extractZip(at: tempCopy, completion: completion)
         }
     }
 
     private func extractZip(at tempUrl: URL, completion: @escaping (Bool) -> Void) {
+        // Pre-extract validation
+        if let error = AudioValidator.preflightZip(at: tempUrl.path) {
+            NSLog("AudioValidator preflight failed: %@", error)
+            try? FileManager.default.removeItem(at: tempUrl)
+            DispatchQueue.main.async { completion(false) }
+            return
+        }
+
         let proc = Process()
         proc.executableURL = URL(fileURLWithPath: "/usr/bin/unzip")
         proc.arguments = ["-o", tempUrl.path, "-d", self.soundsDir]
@@ -211,8 +200,30 @@ class SoundPackManager {
             try proc.run()
             proc.waitUntilExit()
             try? FileManager.default.removeItem(at: tempUrl)
-            DispatchQueue.main.async { completion(proc.terminationStatus == 0) }
+
+            guard proc.terminationStatus == 0 else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
+
+            // Post-extract sanitization — walk each top-level dir that could be a pack
+            let fm = FileManager.default
+            if let dirs = try? fm.contentsOfDirectory(atPath: self.soundsDir) {
+                for dir in dirs where !dir.hasPrefix(".") {
+                    let packPath = (self.soundsDir as NSString).appendingPathComponent(dir)
+                    var isDir: ObjCBool = false
+                    if fm.fileExists(atPath: packPath, isDirectory: &isDir), isDir.boolValue {
+                        let removed = AudioValidator.sanitizeExtractedPack(at: packPath)
+                        if removed > 0 {
+                            NSLog("AudioValidator sanitized %d unsafe files from %@", removed, dir)
+                        }
+                    }
+                }
+            }
+
+            DispatchQueue.main.async { completion(true) }
         } catch {
+            try? FileManager.default.removeItem(at: tempUrl)
             DispatchQueue.main.async { completion(false) }
         }
     }

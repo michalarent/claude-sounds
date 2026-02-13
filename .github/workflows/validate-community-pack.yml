@@ -1,0 +1,48 @@
+name: Validate Community Packs
+
+on:
+  pull_request:
+    paths: [community/manifest.json]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq unzip xxd
+
+      - name: Validate all packs in manifest
+        run: |
+          FAILED=0
+
+          for row in $(jq -c '.packs[]' community/manifest.json); do
+            ID=$(echo "$row" | jq -r '.id')
+            URL=$(echo "$row" | jq -r '.download_url')
+
+            echo "--- Validating pack: $ID ---"
+            echo "Downloading from: $URL"
+
+            TEMP_ZIP="/tmp/${ID}.zip"
+            if ! curl -fSL -o "$TEMP_ZIP" "$URL"; then
+              echo "ERROR: Failed to download $ID from $URL"
+              FAILED=$((FAILED + 1))
+              continue
+            fi
+
+            if ! bash scripts/validate-pack.sh "$TEMP_ZIP" "$ID"; then
+              FAILED=$((FAILED + 1))
+            fi
+
+            rm -f "$TEMP_ZIP"
+            echo ""
+          done
+
+          if [ "$FAILED" -gt 0 ]; then
+            echo "=== $FAILED pack(s) failed validation ==="
+            exit 1
+          fi
+
+          echo "=== All packs passed validation ==="

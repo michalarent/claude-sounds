@@ -1,0 +1,77 @@
+name: Release Community Packs
+
+on:
+  push:
+    branches: [main]
+    paths: [community/manifest.json]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Skip if the manifest update was made by this workflow
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download packs and update manifest
+        run: |
+          mkdir -p /tmp/packs
+          RELEASE_TAG="community-packs"
+          REPO="${{ github.repository }}"
+          RELEASE_URL="https://github.com/${REPO}/releases/download/${RELEASE_TAG}"
+          CHANGED=false
+
+          # Read each pack from manifest
+          for row in $(jq -c '.packs[]' community/manifest.json); do
+            ID=$(echo "$row" | jq -r '.id')
+            URL=$(echo "$row" | jq -r '.download_url')
+            EXPECTED="${RELEASE_URL}/${ID}.zip"
+
+            # Download the zip from wherever it's currently hosted
+            echo "Downloading ${ID} from ${URL}"
+            curl -fSL -o "/tmp/packs/${ID}.zip" "$URL"
+
+            # Validate the downloaded pack before re-hosting
+            echo "Validating ${ID}..."
+            bash scripts/validate-pack.sh "/tmp/packs/${ID}.zip" "$ID"
+
+            # Update manifest URL to point to official release
+            if [ "$URL" != "$EXPECTED" ]; then
+              jq --arg id "$ID" --arg url "$EXPECTED" \
+                '(.packs[] | select(.id == $id)).download_url = $url' \
+                community/manifest.json > /tmp/manifest.json
+              mv /tmp/manifest.json community/manifest.json
+              CHANGED=true
+            fi
+          done
+
+          echo "changed=${CHANGED}" >> "$GITHUB_OUTPUT"
+        id: download
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="community-packs"
+
+          # Create the release if it doesn't exist
+          if ! gh release view "$TAG" &>/dev/null; then
+            gh release create "$TAG" --title "Community Packs" \
+              --notes "Auto-updated community sound packs. This release is managed by CI."
+          fi
+
+          # Upload all pack zips (overwrite existing)
+          gh release upload "$TAG" /tmp/packs/*.zip --clobber
+
+      - name: Commit updated manifest
+        if: steps.download.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add community/manifest.json
+          git commit -m "Update community pack URLs to official release [skip ci]"
+          git push

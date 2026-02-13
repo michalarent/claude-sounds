@@ -170,8 +170,7 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
         guard let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self],
                 options: [.urlReadingFileURLsOnly: true]) as? [URL] else { return false }
 
-        let audioExts = Set(["wav", "mp3", "aiff", "m4a", "ogg", "aac"])
-        let audioUrls = urls.filter { audioExts.contains($0.pathExtension.lowercased()) }
+        let audioUrls = urls.filter { AudioValidator.validateSingleFile(at: $0) }
         guard !audioUrls.isEmpty else { return false }
 
         let destDir = (SoundPackManager.shared.soundsDir as NSString)
@@ -304,7 +303,7 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
         let fm = FileManager.default
         try? fm.createDirectory(atPath: destDir, withIntermediateDirectories: true)
 
-        for url in panel.urls {
+        for url in panel.urls where AudioValidator.validateSingleFile(at: url) {
             let dest = (destDir as NSString).appendingPathComponent(url.lastPathComponent)
             if !fm.fileExists(atPath: dest) {
                 try? fm.copyItem(at: url, to: URL(fileURLWithPath: dest))

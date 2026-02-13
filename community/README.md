@@ -66,4 +66,4 @@ my-pack/
    ```
 4. Open a PR (only the manifest change — no zip files in the repo)
 
-The maintainer may re-host your zip under the official releases for long-term availability. Once merged, anyone with the community registry will see your pack.
+Once merged, CI automatically re-hosts your zip under the official releases and updates the manifest URLs. Your pack will appear in the Sound Pack Browser for all users.
