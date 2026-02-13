@@ -9,6 +9,7 @@ class SoundPackManager {
     let activePackFile: String
     let customManifestsFile: String
     let manifestUrl = "https://raw.githubusercontent.com/michalarent/claude-sounds/main/sound-packs.json"
+    let communityManifestUrl = "https://raw.githubusercontent.com/michalarent/claude-sounds/community-packs/community/manifest.json"
 
     private init() {
         soundsDir = (NSHomeDirectory() as NSString).appendingPathComponent(".claude/sounds")
@@ -251,24 +252,24 @@ class SoundPackManager {
                 completion(primary)
                 return
             }
-            let customURLs = self.customManifestURLs()
-            guard !customURLs.isEmpty else {
-                completion(primary)
-                return
-            }
+
+            // Always include community manifest + any user-added registries
+            var allURLs = [self.communityManifestUrl]
+            allURLs.append(contentsOf: self.customManifestURLs())
 
             var allPacks = primary?.packs ?? []
             let group = DispatchGroup()
 
-            for urlStr in customURLs {
+            for urlStr in allURLs {
                 guard let url = URL(string: urlStr) else { continue }
                 group.enter()
                 URLSession.shared.dataTask(with: url) { data, _, _ in
                     if let data = data,
                        let manifest = try? JSONDecoder().decode(SoundPackManifest.self, from: data) {
                         DispatchQueue.main.async {
-                            let customIds = Set(manifest.packs.map { $0.id })
-                            allPacks.removeAll { customIds.contains($0.id) }
+                            // Later manifests take precedence — remove dupes from earlier
+                            let newIds = Set(manifest.packs.map { $0.id })
+                            allPacks.removeAll { newIds.contains($0.id) }
                             allPacks.append(contentsOf: manifest.packs)
                         }
                     }
