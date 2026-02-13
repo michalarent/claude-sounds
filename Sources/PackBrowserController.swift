@@ -427,10 +427,12 @@ class PackBrowserController: NSObject {
         alert.addButton(withTitle: "Uninstall")
         alert.addButton(withTitle: "Cancel")
         alert.alertStyle = .warning
-        if alert.runModal() == .alertFirstButtonReturn {
-            SoundPackManager.shared.uninstallPack(id: id)
-            installedPacks = SoundPackManager.shared.installedPackIds()
-            rebuildData()
+        alert.beginSheetModal(for: window) { [weak self] response in
+            if response == .alertFirstButtonReturn {
+                SoundPackManager.shared.uninstallPack(id: id)
+                self?.installedPacks = SoundPackManager.shared.installedPackIds()
+                self?.rebuildData()
+            }
         }
     }
 
@@ -452,7 +454,7 @@ class PackBrowserController: NSObject {
                 let alert = NSAlert()
                 alert.messageText = "Download Failed"
                 alert.informativeText = "Could not download or extract the sound pack."
-                alert.runModal()
+                alert.beginSheetModal(for: self?.window ?? NSWindow()) { _ in }
             }
         })
     }
@@ -475,7 +477,7 @@ class PackBrowserController: NSObject {
                 let alert = NSAlert()
                 alert.messageText = "Update Failed"
                 alert.informativeText = "Could not download or extract the updated sound pack."
-                alert.runModal()
+                alert.beginSheetModal(for: self?.window ?? NSWindow()) { _ in }
             }
         })
     }
@@ -502,7 +504,7 @@ class PackBrowserController: NSObject {
                 let alert = NSAlert()
                 alert.messageText = "Extraction Failed"
                 alert.informativeText = "Could not extract the ZIP file."
-                alert.runModal()
+                alert.beginSheetModal(for: self?.window ?? NSWindow()) { _ in }
             }
         }
     }
