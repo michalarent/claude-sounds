@@ -12,7 +12,6 @@ class PackBrowserController: NSObject {
     private var downloadButtons: [String: NSButton] = [:]
     private var updateProgress: [String: NSProgressIndicator] = [:]
     private var updateButtons: [String: NSButton] = [:]
-    private var previewProcess: Process?
 
     override init() {
         window = NSWindow(
@@ -292,14 +291,6 @@ class PackBrowserController: NSObject {
             versionLabel.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor),
         ])
 
-        // Click to preview (installed packs only)
-        if isInstalled {
-            row.identifier = NSUserInterfaceItemIdentifier(id)
-            let click = NSClickGestureRecognizer(target: self, action: #selector(previewPackSound(_:)))
-            click.delaysPrimaryMouseButtonEvents = false
-            row.addGestureRecognizer(click)
-        }
-
         // Buttons
         if isInstalled {
             // Top-right: Active badge or Activate button, plus Update button if available
@@ -525,41 +516,6 @@ class PackBrowserController: NSObject {
         WindowManager.shared.showManageRegistries { [weak self] in
             self?.refresh()
         }
-    }
-
-    @objc func previewPackSound(_ sender: NSClickGestureRecognizer) {
-        guard let row = sender.view, let packId = row.identifier?.rawValue else { return }
-        // Don't preview if the click landed on a button
-        let loc = sender.location(in: row)
-        for sub in row.subviews where sub is NSButton {
-            if sub.frame.contains(loc) { return }
-        }
-        playPreview(forPack: packId)
-    }
-
-    private func playPreview(forPack packId: String) {
-        if let proc = previewProcess, proc.isRunning { proc.terminate() }
-
-        let mgr = SoundPackManager.shared
-        let allFiles = ClaudeEvent.allCases.flatMap { mgr.soundFiles(forEvent: $0, inPack: packId) }
-        guard !allFiles.isEmpty else { return }
-        let file = allFiles[Int.random(in: 0..<allFiles.count)]
-
-        // Read current volume
-        let volumeFile = (NSHomeDirectory() as NSString).appendingPathComponent(".claude/sounds/.volume")
-        var volume: Float = 0.5
-        if let str = try? String(contentsOfFile: volumeFile, encoding: .utf8),
-           let val = Float(str.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            volume = max(0, min(1, val))
-        }
-
-        let proc = Process()
-        proc.executableURL = URL(fileURLWithPath: "/usr/bin/afplay")
-        proc.arguments = ["-v", String(format: "%.2f", volume), file]
-        proc.standardOutput = FileHandle.nullDevice
-        proc.standardError = FileHandle.nullDevice
-        try? proc.run()
-        previewProcess = proc
     }
 
     private func addRegistryRow(_ urlStr: String) {
