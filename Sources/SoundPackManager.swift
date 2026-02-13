@@ -9,7 +9,7 @@ class SoundPackManager {
     let activePackFile: String
     let customManifestsFile: String
     let manifestUrl = "https://raw.githubusercontent.com/michalarent/claude-sounds/main/sound-packs.json"
-    let communityManifestUrl = "https://raw.githubusercontent.com/michalarent/claude-sounds/community-packs/community/manifest.json"
+    let communityManifestUrl = "https://raw.githubusercontent.com/michalarent/claude-sounds/main/community/manifest.json"
 
     private init() {
         soundsDir = (NSHomeDirectory() as NSString).appendingPathComponent(".claude/sounds")
