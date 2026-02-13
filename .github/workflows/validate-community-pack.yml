@@ -18,7 +18,7 @@ jobs:
         run: |
           FAILED=0
 
-          for row in $(jq -c '.packs[]' community/manifest.json); do
+          jq -c '.packs[]' community/manifest.json | while IFS= read -r row; do
             ID=$(echo "$row" | jq -r '.id')
             URL=$(echo "$row" | jq -r '.download_url')
 
@@ -28,17 +28,22 @@ jobs:
             TEMP_ZIP="/tmp/${ID}.zip"
             if ! curl -fSL -o "$TEMP_ZIP" "$URL"; then
               echo "ERROR: Failed to download $ID from $URL"
-              FAILED=$((FAILED + 1))
+              echo "FAIL" >> /tmp/validate-failures
               continue
             fi
 
             if ! bash scripts/validate-pack.sh "$TEMP_ZIP" "$ID"; then
-              FAILED=$((FAILED + 1))
+              echo "FAIL" >> /tmp/validate-failures
             fi
 
             rm -f "$TEMP_ZIP"
             echo ""
           done
+
+          if [ -f /tmp/validate-failures ]; then
+            FAILED=$(wc -l < /tmp/validate-failures)
+            rm -f /tmp/validate-failures
+          fi
 
           if [ "$FAILED" -gt 0 ]; then
             echo "=== $FAILED pack(s) failed validation ==="
