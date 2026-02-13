@@ -10,8 +10,10 @@ A macOS menu bar app for managing sound packs in [Claude Code](https://docs.anth
 - **Sound Pack Browser** - Browse, download, install, and manage sound packs
 - **Event Editor** - Drag-and-drop audio files onto individual events; preview sounds inline
 - **Create Custom Packs** - Built-in wizard to scaffold a new sound pack with all event directories
+- **Publish Packs** - Export any local pack as a ZIP or submit it to the community registry via GitHub PR
 - **Setup Wizard** - Guided first-run setup that installs Claude Code hooks automatically
 - **Hook integration** - Installs shell hooks that trigger sounds on Claude Code events
+- **Audio validation** - Magic-byte verification, ZIP preflight, and post-extract sanitization at every entry point
 
 ## Supported Events
 
