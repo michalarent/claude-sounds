@@ -74,11 +74,16 @@ class EventItem {
 class SoundFileItem {
     let path: String
     let filename: String
+    let isSkipped: Bool
     weak var parent: EventItem?
 
     init(path: String, parent: EventItem) {
         self.path = path
-        self.filename = (path as NSString).lastPathComponent
+        self.isSkipped = path.hasSuffix(".disabled")
+        self.filename = {
+            let name = (path as NSString).lastPathComponent
+            return name.hasSuffix(".disabled") ? String(name.dropLast(".disabled".count)) : name
+        }()
         self.parent = parent
     }
 }
@@ -111,12 +116,21 @@ class SoundPackManager {
     }
 
     func soundFiles(forEvent event: ClaudeEvent, inPack packId: String) -> [String] {
+        return allSoundFiles(forEvent: event, inPack: packId).filter { !$0.hasSuffix(".disabled") }
+    }
+
+    func allSoundFiles(forEvent event: ClaudeEvent, inPack packId: String) -> [String] {
         let dir = (soundsDir as NSString).appendingPathComponent("\(packId)/\(event.rawValue)")
         let fm = FileManager.default
         guard let files = try? fm.contentsOfDirectory(atPath: dir) else { return [] }
         let exts = Set(["wav", "mp3", "aiff", "m4a", "ogg", "aac"])
         return files.filter { f in
-            exts.contains((f as NSString).pathExtension.lowercased())
+            let ext = (f as NSString).pathExtension.lowercased()
+            if ext == "disabled" {
+                let inner = ((f as NSString).deletingPathExtension as NSString).pathExtension.lowercased()
+                return exts.contains(inner)
+            }
+            return exts.contains(ext)
         }.map { (dir as NSString).appendingPathComponent($0) }.sorted()
     }
 
@@ -1082,9 +1096,9 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
 
         let actionsCol = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("actions"))
         actionsCol.title = ""
-        actionsCol.width = 100
-        actionsCol.minWidth = 80
-        actionsCol.maxWidth = 120
+        actionsCol.width = 120
+        actionsCol.minWidth = 100
+        actionsCol.maxWidth = 150
         outlineView.addTableColumn(actionsCol)
 
         outlineView.outlineTableColumn = nameCol
@@ -1139,7 +1153,7 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
     private func reloadSoundData() {
         eventItems = ClaudeEvent.allCases.map { event in
             let item = EventItem(event: event)
-            let files = SoundPackManager.shared.soundFiles(forEvent: event, inPack: currentPackId)
+            let files = SoundPackManager.shared.allSoundFiles(forEvent: event, inPack: currentPackId)
             item.soundFiles = files.map { SoundFileItem(path: $0, parent: item) }
             return item
         }
@@ -1229,8 +1243,9 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
                 return cell
             }
             if let fi = item as? SoundFileItem {
-                let cell = NSTextField(labelWithString: fi.filename)
+                let cell = NSTextField(labelWithString: fi.isSkipped ? "\(fi.filename) (skipped)" : fi.filename)
                 cell.font = .systemFont(ofSize: 12)
+                cell.textColor = fi.isSkipped ? .tertiaryLabelColor : .labelColor
                 return cell
             }
         }
@@ -1255,12 +1270,21 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
 
                 container.addArrangedSubview(playBtn)
                 container.addArrangedSubview(addBtn)
-            } else if item is SoundFileItem {
+            } else if let fi = item as? SoundFileItem {
                 let playBtn = NSButton(image: NSImage(systemSymbolName: "play.fill",
                     accessibilityDescription: "Play")!, target: self,
                     action: #selector(playFile(_:)))
                 playBtn.bezelStyle = .inline
                 playBtn.isBordered = false
+
+                let skipIcon = fi.isSkipped ? "forward.fill" : "forward.end.fill"
+                let skipLabel = fi.isSkipped ? "Unskip" : "Skip"
+                let skipBtn = NSButton(image: NSImage(systemSymbolName: skipIcon,
+                    accessibilityDescription: skipLabel)!, target: self,
+                    action: #selector(toggleSkip(_:)))
+                skipBtn.bezelStyle = .inline
+                skipBtn.isBordered = false
+                skipBtn.contentTintColor = fi.isSkipped ? .systemGreen : .systemOrange
 
                 let delBtn = NSButton(image: NSImage(systemSymbolName: "trash",
                     accessibilityDescription: "Delete")!, target: self,
@@ -1270,6 +1294,7 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
                 delBtn.contentTintColor = .systemRed
 
                 container.addArrangedSubview(playBtn)
+                container.addArrangedSubview(skipBtn)
                 container.addArrangedSubview(delBtn)
             }
 
@@ -1326,6 +1351,20 @@ class EventEditorController: NSObject, NSOutlineViewDataSource, NSOutlineViewDel
             }
         }
 
+        reloadSoundData()
+    }
+
+    @objc func toggleSkip(_ sender: NSButton) {
+        guard let fi = itemForSender(sender) as? SoundFileItem else { return }
+        let fm = FileManager.default
+        let newPath: String
+        if fi.isSkipped {
+            // Unskip: remove .disabled suffix
+            newPath = String(fi.path.dropLast(".disabled".count))
+        } else {
+            newPath = fi.path + ".disabled"
+        }
+        try? fm.moveItem(atPath: fi.path, toPath: newPath)
         reloadSoundData()
     }
 
