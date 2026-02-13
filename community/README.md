@@ -12,8 +12,8 @@ You can also install any pack directly via **Install URL...** using the zip link
 
 | Pack | Author | Description | Download |
 |------|--------|-------------|----------|
-| StarCraft Protoss | Blizzard Entertainment | Protoss voice lines from StarCraft | [protoss.zip](packs/protoss.zip) |
-| Super Mario Bros. (NES) | Community | Classic NES sound effects from Super Mario Bros. | [super-mario-nes.zip](packs/super-mario-nes.zip) |
+| StarCraft Protoss | Blizzard Entertainment | Protoss voice lines from StarCraft | [protoss.zip](https://github.com/michalarent/claude-sounds/releases/download/v2.0/protoss.zip) |
+| Super Mario Bros. (NES) | Community | Classic NES sound effects from Super Mario Bros. | [super-mario-nes.zip](https://github.com/michalarent/claude-sounds/releases/download/v2.0/super-mario-nes.zip) |
 
 ## Contributing a pack
 
@@ -49,7 +49,7 @@ my-pack/
 ### How to submit
 
 1. Fork this repo
-2. Add your zip to `community/packs/<pack-id>.zip`
+2. Upload your zip to a GitHub Release on your fork (or any publicly accessible URL)
 3. Update `community/manifest.json` — add an entry to the `packs` array:
    ```json
    {
@@ -58,12 +58,12 @@ my-pack/
      "description": "Short description of your pack",
      "version": "1.0",
      "author": "Your Name",
-     "download_url": "https://raw.githubusercontent.com/michalarent/claude-sounds/main/community/packs/my-pack.zip",
+     "download_url": "https://github.com/<your-user>/claude-sounds/releases/download/v1.0/my-pack.zip",
      "size": "1.2 MB",
      "file_count": 15,
      "preview_url": null
    }
    ```
-4. Open a PR
+4. Open a PR (only the manifest change — no zip files in the repo)
 
-That's it! Once merged, anyone with the community registry will see your pack.
+The maintainer may re-host your zip under the official releases for long-term availability. Once merged, anyone with the community registry will see your pack.
