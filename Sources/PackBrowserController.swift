@@ -355,10 +355,12 @@ class PackBrowserController: NSObject {
 
             let isLocalOnly = !manifestPacks.contains(where: { $0.id == id })
 
-            let editBtn = createButton("Edit", id: id, action: #selector(editPack(_:)))
-            editBtn.translatesAutoresizingMaskIntoConstraints = false
-            row.addSubview(editBtn)
-            bottomButtons.append(editBtn)
+            if isLocalOnly {
+                let editBtn = createButton("Edit", id: id, action: #selector(editPack(_:)))
+                editBtn.translatesAutoresizingMaskIntoConstraints = false
+                row.addSubview(editBtn)
+                bottomButtons.append(editBtn)
+            }
 
             if isLocalOnly {
                 let publishBtn = createButton("Publish", id: id, action: #selector(publishPack(_:)))
