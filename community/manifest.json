@@ -59,6 +59,16 @@
       "name" : "Dark Souls",
       "size" : "5.1 MB",
       "version" : "1.0"
+    },
+    {
+      "author" : "michalarent",
+      "description" : "",
+      "download_url" : "https:\/\/github.com\/michalarent\/claude-sounds\/releases\/download\/v2.0\/portal-ii--glados.zip",
+      "file_count" : 24,
+      "id" : "portal-ii--glados",
+      "name" : "Portal II Glados",
+      "size" : "4,1 MB",
+      "version" : "1.0"
     }
   ],
   "version" : "1"
