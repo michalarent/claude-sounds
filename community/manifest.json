@@ -1,4 +1,16 @@
 {
   "version": "1",
-  "packs": []
+  "packs": [
+    {
+      "id": "super-mario-nes",
+      "name": "Super Mario Bros. (NES)",
+      "description": "Classic NES sound effects from Super Mario Bros.",
+      "version": "1.0",
+      "author": "Community",
+      "download_url": "https://raw.githubusercontent.com/michalarent/claude-sounds/main/community/packs/super-mario-nes.zip",
+      "size": "450 KB",
+      "file_count": 20,
+      "preview_url": null
+    }
+  ]
 }
